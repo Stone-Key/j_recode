@@ -1,4 +1,4 @@
-package jFile;
+package jFile.body;
 
 import lombok.Data;
 
@@ -14,7 +14,9 @@ public class Cclass {
 	private List<Cconstractor> cconstractors = new ArrayList<>();
 	private List<Cmethoad> cmethoads = new ArrayList<>();
 	private List<AtInterface> atInterfaces = new ArrayList<>();
-	
 
-	
+
+	public Cclass(ArrayList<String> strings) {
+
+	}
 }

@@ -1,4 +1,4 @@
-package jFile;
+package jFile.body;
 
 import lombok.*;
 
