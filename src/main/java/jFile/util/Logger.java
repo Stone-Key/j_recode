@@ -1,5 +1,7 @@
 package jFile.util;
 
+import jFile.exception.LogException;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -37,13 +39,19 @@ public class Logger {
 		bWriter = new BufferedWriter(fileWriter);
 	}
 	
-	public static void appendLog(String log) throws IOException {
-		System.out.println("log:"+ new Date() + ":" + log);
-		if (logNow) {
-			bWriter.write(log);
-			bWriter.flush();
-		}else {
-			bWriter.write(log);
+	public static void appendLog(String log) {
+		try {
+			log = "[" + new Date().toString()+ "]" + log;
+			System.out.println("log:"  + log);
+			if (logNow) {
+				bWriter.write(log);
+				bWriter.flush();
+			}else {
+				bWriter.write(log);
+			}
+		}catch (IOException e){
+			e.printStackTrace();
+			throw new LogException("日志写入失败");
 		}
 	}
 	

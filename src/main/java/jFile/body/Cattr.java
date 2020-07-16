@@ -17,7 +17,9 @@ public class Cattr {
 	private String name;//属性名
 	private String value;//属性在定义时的属性值
 	
-	
+	public Cattr(String sorce , List<String> beforMsgs){
+
+	}
 
 	
 }

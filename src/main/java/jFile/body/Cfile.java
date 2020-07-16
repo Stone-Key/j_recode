@@ -10,6 +10,7 @@ import jFile.util.FileIoUtil;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -49,8 +50,11 @@ public class Cfile {
 		boolean writeClass = false;
 		ArrayList<String> strings = new ArrayList<>();
 		//找到所有在文件中定义的类
-		for (String item: codeLines ) {
+		int classBeginLineNum = 0 ;
+		for (int ind = 0 ; ind < codeLines.size(); ind ++ ) {
+			String item = codeLines.get(ind);
 			if(strDefineClass(item)){
+				classBeginLineNum = ind;
 				writeClass = true;
 			}
 			if (writeClass){
@@ -58,18 +62,36 @@ public class Cfile {
 					if (item.charAt(i) == '{') blockStake ++;
 					if (item.charAt(i) == '}') blockStake --;
 					if (blockStake <0){
-						throw new FileUncodeException("读取代码块层级错误!");
+						throw new FileUncodeException("读取类归属代码块层级错误!");
 					}
 				}
 				strings.add(item);
 			}
-			if (blockStake == 0){
+			if (writeClass && blockStake == 0){
 				writeClass = false;
-				Cclass cclass = new Cclass(strings);
+				List<String> underClassCodes = getUnderClassLines(classBeginLineNum,codeLines);
+				Cclass cclass = new Cclass(strings,underClassCodes);
 				this.classes.add(cclass);
 				strings = new ArrayList<>();
 			}
 		}
+	}
+
+	//获取类上面的注解,注释等内容.如果遇到与类的定义无关的内容,则结束
+	private List<String> getUnderClassLines(int lineIndex , List<String> source){
+		if (lineIndex > source.size()){
+			throw new FileUncodeException("行索引错误!");
+		}
+		ArrayList<String> result = new ArrayList<>();
+		for (int i = lineIndex -1 ; i >0 ; i--) {
+			String s = source.get(i);
+			if (s.startsWith("import") || s.endsWith("}") || s.startsWith("package")){
+				break;
+			}
+			result.add(s);
+		}
+		Collections.reverse(result);
+		return  result;
 	}
 
 	//判断字符串是否包含了定义一个类的字符
@@ -80,9 +102,9 @@ public class Cfile {
 		if (str.startsWith("public")){
 			int aClass = str.indexOf("class");
 			if ( 5 < aClass ){
-				for (int i = 5; i < aClass ; i++) {
+				for (int i = 6; i < aClass ; i++) {
 					//当权限修饰符与类定义关键字之间有其它字符
-					if (str.charAt(i) != ' ' && str.charAt(i) != '\n'){
+					if (str.charAt(i) != ' ' && str.charAt(i) != '\n' && str.charAt(i) != '\r'){
 						return  false;
 					}
 				}
