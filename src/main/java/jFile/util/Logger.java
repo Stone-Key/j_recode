@@ -34,6 +34,7 @@ public class Logger {
 			LOG_FILE.getParentFile().mkdirs();
 		}
 		LOG_FILE.createNewFile();
+		System.out.println("日志文件创建成功! ==> " + LOG_FILE.toString());
 		
 		fileWriter = new FileWriter(LOG_FILE,true);
 		bWriter = new BufferedWriter(fileWriter);
@@ -51,7 +52,12 @@ public class Logger {
 			}
 		}catch (IOException e){
 			e.printStackTrace();
-			throw new LogException("日志写入失败");
+			System.out.println("日志写入失败,尝试新建日志文件");
+			try {
+				init();
+			} catch (IOException ex) {
+				throw new LogException("日志重建失败");
+			}
 		}
 	}
 	

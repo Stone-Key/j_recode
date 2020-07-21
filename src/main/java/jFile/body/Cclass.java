@@ -185,9 +185,30 @@ public class Cclass {
 				otherMsgs.add(note);
 				continue;
 			}
+
+			/**
+			 * 下面的解析类内部的属性,方法,构造器,代码块等内容的方法要重新写.
+			 * 打算先按照结构拼接完整的一行字符串,表示一个完整的方法.缺点是我得处理注释的位置和起止点,不然还原的时候不知道注释从哪里开始,从哪里结束
+			 */
+
 			if (!item.contains("{") ){//属性(对属性赋值时没有赋值匿名实现类或者其他带有代码块符号的情况)
-				if (item.trim().endsWith(";")){//单行定义的未赋值属性
+				if (item.trim().endsWith(";")){//单行定义的属性
 					this.cattrs.add(new Cattr(item,otherMsgs));
+					otherMsgs = new ArrayList<>();
+				}else if ( item.contains("(") ){//有引用数据类型初始化的属性,而且这个属性的声明还没结束(因为没有分号..还好java语法很严格,不然还真不好判断)
+					if (item.substring(0,item.indexOf('(')).contains(" new ") || (item.substring(0,item.indexOf('(')).contains("=new "))){
+						String initCode = item.substring(item.indexOf("=")).trim();
+						for( ++i ; i < classInner.size() ; i ++){
+							item = classInner.get(i);
+							if (item.contains(";")){
+								initCode += " " + item.substring(0,item.indexOf(';'));
+								break;
+							}else {
+								initCode += " " + item;
+							}
+						}
+						this.cattrs.add(new Cattr());
+					}
 				}
 
 			}

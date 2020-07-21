@@ -16,6 +16,9 @@ final public class StrUtil {
 
     public static int countFlag(String str , String flag){
         int count = 0;
+        if (flag.equals("")){
+            return 0;
+        }
        while (true){
            if (str.contains(flag)){
                count ++ ;
